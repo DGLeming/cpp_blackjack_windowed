@@ -9,7 +9,9 @@ enum DrwblsTypes
 {
 	DEFAULT,
 	DRAWCARD,
-	STAND
+	STAND,
+	YES,
+	NO
 };
 
 struct Drawable
@@ -74,7 +76,12 @@ public:
 	std::string getCardAddres(const PlayCard card);
 	void addDrawable(const char* path, int posx, int posy, int width, int height, DrwblsTypes type);
 	void getCard(std::array<PlayCard, 22> &hand, bool player);
-	void cardsRedraw();
+	void cardsRedraw(bool player);
+	int getImageWidth(int score);
+	std::string getUrl(int score);
+	void gameOver(bool winner, bool tie);
+	void newgame();
+	void initForNewGame();
 
 private:
 	bool isRunning;
@@ -87,7 +94,10 @@ private:
 	int cardHeight = 101;
 	std::array<PlayCard, 52> playdeck;
 	std::vector<Drawable> drawbls;
+	std::vector<Drawable> scoreDrawables;
 	std::array<PlayCard, 22> playerHand, dealerHand;
 	int playerCards = 0;
 	int dealerCards = 0;
+	int playerScore = 0;
+	int dealerScore = 0;
 };

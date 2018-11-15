@@ -30,6 +30,7 @@ int main(int argc, char * argv[])
 	}
 
 	game->clean();
+	SDL_Quit();
 	return 0;
 }
 
