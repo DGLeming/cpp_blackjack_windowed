@@ -4,7 +4,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
-#define SLEEPMILLIS 400
+#define SLEEPMILLIS 300
 
 SDL_Texture* cardTex;
 SDL_Rect cardSrc, cardDest;
