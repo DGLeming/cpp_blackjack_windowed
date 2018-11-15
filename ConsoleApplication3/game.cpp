@@ -2,6 +2,9 @@
 #include <iostream>
 #include <time.h>
 #include <string>
+#include <chrono>
+#include <thread>
+#define SLEEPMILLIS 400
 
 SDL_Texture* cardTex;
 SDL_Rect cardSrc, cardDest;
@@ -17,6 +20,7 @@ Game::~Game()
 
 void Game::newgame()
 {
+	std::cout << "NEW GAME STARTED!" << std::endl;
 	for (int i = 0; i < cardsInDeck; i++){
 		deck[i].texture = nullptr;
 		deck[i].cardDest.x = deck[i].cardDest.y = deck[i].cardDest.w = deck[i].cardDest.h = 0;
@@ -30,7 +34,7 @@ void Game::newgame()
 	std::array<PlayCard, 22> emptyHand;
 	playerHand = emptyHand;
 	dealerHand = emptyHand;
-	playerCards = dealerCards = playerScore = dealerScore = 0;
+	playerCards = dealerCards = playerScore = dealerScore = playerAces = dealerAces = 0;
 	initForNewGame();
 }
 
@@ -153,9 +157,14 @@ void Game::handleEnents()
 					newgame();
 				}
 				else if ((drawbls.at(i)).type == STAND){
+					std::cout << "player score is " << playerScore << ", dealer score is " << dealerScore << std::endl;
 					while (dealerScore <= 17){
+						std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPMILLIS));
 						getCard(dealerHand, false);
+						render();
+						std::cout << "player score is " << playerScore << ", dealer score is " << dealerScore << std::endl;
 					}
+					std::cout << "finaly - player score is " << playerScore << ", dealer score is " << dealerScore << std::endl;
 					if (dealerScore > 21){
 						gameOver(true, false);
 					}
@@ -171,6 +180,7 @@ void Game::handleEnents()
 						}
 					}
 				}
+				break;
 			}
 		}
 		/*addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 200, 100);*/
@@ -256,12 +266,8 @@ void Game::getCard(std::array<PlayCard, 22> &hand, bool player)
 			playerScore += 10;
 			break;
 		case RANK_ACE:
-			if (playerScore <= 10){
-				playerScore += 11;
-			}
-			else {
-				playerScore += 1;
-			}
+			playerScore += 11;
+			playerAces++;
 			break;
 		default:
 			break;
@@ -303,12 +309,8 @@ void Game::getCard(std::array<PlayCard, 22> &hand, bool player)
 			dealerScore += 10;
 			break;
 		case RANK_ACE:
-			if (dealerScore <= 10){
-				dealerScore += 11;
-			}
-			else {
-				dealerScore += 1;
-			}
+			dealerScore += 11;
+			dealerAces++;
 			break;
 		default:
 			break;
@@ -320,6 +322,7 @@ void Game::getCard(std::array<PlayCard, 22> &hand, bool player)
 
 void Game::gameOver(bool winner, bool tie)
 {
+	std::cout << "game over. winner = " << winner << std::endl;
 	drawbls.at(0).destR.w = 0;
 	drawbls.at(1).destR.w = 0;
 	if (tie){
@@ -357,6 +360,18 @@ void Game::cardsRedraw(bool player)
 	}
 	//drawing score
 	int padding = 75;
+	if (playerScore > 21){
+		if (playerAces > 0){
+			playerAces--;
+			playerScore -= 10;
+		}
+	}
+	if (dealerScore > 21){
+		if (dealerAces > 0){
+			dealerAces--;
+			dealerScore -= 10;
+		}
+	}
 	if ((playerScore <= 21) && (dealerScore <= 21)){
 		if (player){
 			if (playerScore == 21){
@@ -381,7 +396,6 @@ void Game::cardsRedraw(bool player)
 				scoreDrawables.at(1) = tmpDrawable;
 			}
 			else {
-				std::cout << "2" << std::endl;
 				std::string url = getUrl(playerScore);
 				SDL_Surface* tmpSurface = IMG_Load(url.c_str());
 				scoreDrawables.at(0).texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
@@ -417,7 +431,6 @@ void Game::cardsRedraw(bool player)
 				scoreDrawables.at(1) = tmpDrawable;
 			}
 			else {
-				std::cout << "3" << std::endl;
 				std::string url = getUrl(dealerScore);
 				SDL_Surface* tmpSurface = IMG_Load(url.c_str());
 				scoreDrawables.at(1).texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
@@ -435,7 +448,6 @@ void Game::cardsRedraw(bool player)
 			gameOver(false, false);
 		}
 		//someones score is more then 21 (busted)
-		std::cout << "1" << std::endl;
 		Drawable tmpDrawable;
 		SDL_Surface* tmpSurface = IMG_Load("assets/score/gameover.png");
 

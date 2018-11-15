@@ -100,4 +100,6 @@ private:
 	int dealerCards = 0;
 	int playerScore = 0;
 	int dealerScore = 0;
+	int playerAces = 0;
+	int dealerAces = 0;
 };
