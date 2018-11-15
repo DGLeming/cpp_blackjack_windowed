@@ -1,8 +1,10 @@
-﻿Сборка начата 15.11.2018 13:13:13.
+﻿Сборка начата 15.11.2018 16:22:04.
      1>Проект "C:\Users\Кирилл\Desktop\blackjack_visual\ConsoleApplication3\ConsoleApplication3.vcxproj" в узле 2 (целевые объекты Build).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I../SDL2/include /I../SDL2_image/include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt game.cpp
          game.cpp
+     1>c:\users\кирилл\desktop\blackjack_visual\consoleapplication3\game.cpp(73): warning C4018: <: несоответствие типов со знаком и без знака
+     1>c:\users\кирилл\desktop\blackjack_visual\consoleapplication3\game.cpp(93): warning C4018: <: несоответствие типов со знаком и без знака
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Кирилл\Desktop\blackjack_visual\Debug\ConsoleApplication3.exe" /INCREMENTAL /NOLOGO /LIBPATH:../SDL2/lib/x86 /LIBPATH:../SDL2_image/lib/x86 SDL2.lib SDL2main.lib SDL2_image.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Кирилл\Desktop\blackjack_visual\Debug\ConsoleApplication3.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Кирилл\Desktop\blackjack_visual\Debug\ConsoleApplication3.lib" /MACHINE:X86 Debug\main.obj
          Debug\game.obj
@@ -11,4 +13,4 @@
 
 Сборка успешно завершена.
 
-Затраченное время: 00:00:02.52
+Затраченное время: 00:00:01.90

@@ -1,6 +1,23 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include <array>
+#include <vector>
+#define WINDOW_WIDTH 900
+#define WINDOW_HEIGHT 600
+
+enum DrwblsTypes
+{
+	DEFAULT,
+	DRAWCARD,
+	STAND
+};
+
+struct Drawable
+{
+	SDL_Rect srcR,destR;
+	SDL_Texture* texture;
+	DrwblsTypes type;
+};
 
 enum CardSuit
 {
@@ -31,6 +48,7 @@ enum CardRank
 struct Card{
 	SDL_Texture* texture;
 	SDL_Rect cardDest;
+	bool owner;
 };
 
 struct PlayCard{
@@ -49,11 +67,14 @@ public:
 	void update();
 	void render();
 	void clean();
-	void addCard(const char* path, int posx, int posy);
+	void addCard(const char* path, int posx, int posy, bool own);
 	std::array<PlayCard, 52> getShuffledDeck();
 	int getRandomNumber(int min, int max);
 	void swapCards(PlayCard &card1, PlayCard &card2);
 	std::string getCardAddres(const PlayCard card);
+	void addDrawable(const char* path, int posx, int posy, int width, int height, DrwblsTypes type);
+	void getCard(std::array<PlayCard, 22> &hand, bool player);
+	void cardsRedraw();
 
 private:
 	bool isRunning;
@@ -65,4 +86,8 @@ private:
 	int cardWidth = 70;
 	int cardHeight = 101;
 	std::array<PlayCard, 52> playdeck;
+	std::vector<Drawable> drawbls;
+	std::array<PlayCard, 22> playerHand, dealerHand;
+	int playerCards = 0;
+	int dealerCards = 0;
 };

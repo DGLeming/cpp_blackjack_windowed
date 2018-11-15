@@ -46,7 +46,17 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	cardSrc.x = cardSrc.y = 0;
 	cardSrc.w = Game::cardWidth;
 	cardSrc.h = Game::cardHeight;
-	addCard(Game::getCardAddres(playdeck[0]).c_str(), 200, 200);
+	//addCard(Game::getCardAddres(playdeck[0]).c_str(), 200, 200);
+	addDrawable("assets/draw.png", WINDOW_WIDTH / 2 - 122, WINDOW_HEIGHT - 200, 244, 56, DRAWCARD);
+	addDrawable("assets/stand.png", WINDOW_WIDTH / 2 - 74, WINDOW_HEIGHT - 100, 148, 56, STAND);
+	addDrawable("assets/you.png", 75, 90, 198, 48, DEFAULT);
+	addDrawable("assets/score/21.png", 75 + (198 - 177) / 2, 20, 177, 48, DEFAULT);
+	addDrawable("assets/dealer.png", WINDOW_WIDTH - 75 - 252, 90, 252, 48, DEFAULT);
+	addDrawable("assets/score/21.png", WINDOW_WIDTH - 75 - 252 + (252 - 177) / 2, 20, 177, 48, DEFAULT);
+	getCard(playerHand, true);
+	getCard(dealerHand, false);
+	getCard(playerHand, true);
+
 }
 
 void Game::update()
@@ -59,6 +69,11 @@ void Game::render()
 	for (int i = 0; i < cardsInDeck; i++){
 		SDL_RenderCopy(renderer, Game::deck[i].texture, &cardSrc, &Game::deck[i].cardDest);
 	}
+
+	for (int i = 0; i < drawbls.size(); i++){
+		SDL_RenderCopy(renderer, drawbls.at(i).texture, &drawbls.at(i).srcR, &drawbls.at(i).destR);
+	}
+
 	SDL_RenderPresent(renderer);
 }
 
@@ -75,13 +90,19 @@ void Game::handleEnents()
 	case SDL_MOUSEBUTTONDOWN:
 		x = event.button.x;
 		y = event.button.y;
-		if (x > 450){
-			addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 600, 100);
+		for (int i = 0; i < drawbls.size(); i++){
+			// was mouse clicking on drawbl
+			if ((x < (drawbls.at(i).destR.x + drawbls.at(i).destR.w)) && (x >= drawbls.at(i).destR.x) && (y < (drawbls.at(i).destR.y + drawbls.at(i).destR.h)) && (y >= drawbls.at(i).destR.y)){
+				//your center = 75+198/2 = 174;
+				//your height end = 50 + 48 = 98;
+				//dealer center = 900-75-252/2 = 825 - 126 = 699
+				if ((drawbls.at(i)).type == DRAWCARD){
+					//addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 174 - cardWidth / 2, 150);
+					getCard(playerHand, true);
+				}				
+			}
 		}
-		else {
-			addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 200, 100);
-		}
-		
+		/*addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 200, 100);*/
 		break;
 	default:
 		break;
@@ -96,9 +117,8 @@ void Game::clean()
 	std::cout << "game cleaned" << std::endl;
 }
 
-void Game::addCard(const char* path, int posx, int posy)
+void Game::addCard(const char* path, int posx, int posy, bool own)
 {
-	std::cout << "Adding card - " << path << " at x=" << posx << ", y=" << posy << std::endl;
 	SDL_Surface* tmpSurface = IMG_Load(path);
 	Game::deck[Game::cardsInDeck].texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
 	SDL_FreeSurface(tmpSurface);
@@ -106,7 +126,60 @@ void Game::addCard(const char* path, int posx, int posy)
 	Game::deck[Game::cardsInDeck].cardDest.y = posy;
 	Game::deck[Game::cardsInDeck].cardDest.h = Game::cardHeight;
 	Game::deck[Game::cardsInDeck].cardDest.w = Game::cardWidth;
+	Game::deck[Game::cardsInDeck].owner = own;
 	Game::cardsInDeck++;
+}
+
+void Game::addDrawable(const char* path, int posx, int posy, int width, int height, DrwblsTypes type)
+{
+	Drawable tmpDrawbl;
+	SDL_Surface* tmpSurface = IMG_Load(path);
+	tmpDrawbl.texture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+	SDL_FreeSurface(tmpSurface);
+	tmpDrawbl.destR.x = posx;
+	tmpDrawbl.destR.y = posy;
+	tmpDrawbl.destR.w = width;
+	tmpDrawbl.destR.h = height;
+	tmpDrawbl.srcR.x = 0;
+	tmpDrawbl.srcR.y = 0;
+	tmpDrawbl.srcR.w = width;
+	tmpDrawbl.srcR.h = height;
+	tmpDrawbl.type = type;
+	drawbls.push_back(tmpDrawbl);
+}
+
+void Game::getCard(std::array<PlayCard, 22> &hand, bool player)
+{
+	if (player)	{
+		addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 174 - cardWidth / 2, 150, true);
+		hand[playerCards] = playdeck[cardsInDeck - 1];
+		playerCards++;
+	}
+	else {
+		addCard(Game::getCardAddres(playdeck[cardsInDeck]).c_str(), 699 - cardWidth / 2, 150, false);
+		hand[dealerCards] = playdeck[cardsInDeck - 1];
+		dealerCards++;
+	}
+	cardsRedraw();
+}
+
+void Game::cardsRedraw()
+{
+	int playerStart = 174 - playerCards * 35;
+	int dealerStart = 700 - dealerCards * 35;
+	int playerRedrawed = 0;
+	int dealerRedrawed = 0;
+	for (int i = 0; i < cardsInDeck; i++){
+		if (deck[i].owner){
+			deck[i].cardDest.x = playerStart + playerRedrawed * 70;
+			playerRedrawed++;
+		}
+		else{
+			deck[i].cardDest.x = dealerStart + dealerRedrawed * 70;
+			dealerRedrawed++;
+		}
+	}
+	std::cout << "Player have " << playerCards << " cards, and dealer have " << dealerCards << " cards" << std::endl;
 }
 
 void Game::swapCards(PlayCard &card1, PlayCard &card2){
